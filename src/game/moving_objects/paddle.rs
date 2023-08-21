@@ -92,4 +92,7 @@ impl MovingObject for Paddle {
             self.boundary.y = screen_height() - self.boundary.h;
         }
     }
+    fn handle_collision(&mut self, other: Box<dyn MovingObject>) {
+        
+    }
 }

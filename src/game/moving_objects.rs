@@ -1,4 +1,9 @@
-use macroquad::prelude::*;
+use macroquad::prelude::{
+    Vec2,
+    screen_width,
+    screen_height,
+};
+
 
 pub mod ball;
 pub mod paddle;
@@ -7,6 +12,7 @@ pub trait MovingObject {
     fn update_position(&mut self);
     fn draw(&self);
     fn keep_in_window(&mut self);
+    fn handle_collision(&mut self, other: Box<dyn MovingObject>);
 }
 
 // x and y define the top left corner 

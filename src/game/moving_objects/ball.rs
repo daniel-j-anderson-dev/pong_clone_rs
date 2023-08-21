@@ -56,4 +56,7 @@ impl MovingObject for Ball {
             self.velocity.y *= -1.0;
         }
     }
+    fn handle_collision(&mut self, other: Box<dyn MovingObject>) {
+        
+    }
 }
