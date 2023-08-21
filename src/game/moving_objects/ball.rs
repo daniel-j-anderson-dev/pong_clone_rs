@@ -1,7 +1,12 @@
-use macroquad::prelude::*;
+use crate::game::moving_objects::{MovingObject, paddle::Paddle, Rectangle};
 
-use super::*;
-use super::paddle::Paddle;
+use macroquad::prelude::{
+    Color,
+    Vec2,
+    screen_width,
+    screen_height,
+    draw_rectangle,
+};
 
 pub struct Ball {
     pub boundary: Rectangle,
