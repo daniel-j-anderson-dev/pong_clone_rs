@@ -1,17 +1,20 @@
-use macroquad::prelude::*;
+use macroquad::prelude::{
+    KeyCode,
+    is_key_down,
+    next_frame,
+};
 
 pub mod game;
-use game::GameMode;
 
 #[macroquad::main("pong_clone")]
 async fn main() {
-    let mut game_state = game::State::new(GameMode::TwoPlayerLocal);
+    let mut game_state = game::State::new();
     loop {
         if is_key_down(KeyCode::Escape) {
             break;
         }
         if is_key_down(KeyCode::Backspace) {
-            game_state = game::State::new(GameMode::TwoPlayerLocal);
+            game_state = game::State::new();
         }
 
         game_state.draw();
