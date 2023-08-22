@@ -5,7 +5,6 @@ use macroquad::prelude::{
     DVec2,
     screen_width,
     screen_height,
-    draw_rectangle,
 };
 
 pub struct Ball {
