@@ -4,7 +4,7 @@ use self::moving_objects::{ball::Ball, paddle::Paddle, Rectangle, MovingObject};
 
 use macroquad::{
     prelude::{
-        Vec2,
+        DVec2,
         clear_background,
         draw_text,
         screen_width,
@@ -40,7 +40,7 @@ impl State {
         );
         let ball = Ball::new(
             Rectangle::new_centered(ball_size, ball_size),
-            Vec2::new(1.5, 1.5),
+            DVec2::new(1.5, 1.5),
             WHITE
         );
 
@@ -61,8 +61,18 @@ impl State {
             None => {
                 self.player0.update_position();
                 self.player1.update_position();
+
                 self.player0.handle_input();
                 self.player1.handle_input();
+
+                if let Some(intersection) = self.ball.boundary.get_intersection_with(&self.player0.boundary) {
+                    println!("ball intersected with player0, {intersection:?}");
+                    self.player0.handle_collision(&mut self.ball);
+                } else if let Some(intersection) = self.ball.boundary.get_intersection_with(&self.player1.boundary) {
+                    println!("ball intersected with player0, {intersection:?}");
+                    self.player1.handle_collision(&mut self.ball);
+                }
+
                 self.ball.update_position();
             }
         }
