@@ -1,7 +1,9 @@
 use macroquad::prelude::{
-    Vec2,
+    DVec2,
+    Color,
     screen_width,
     screen_height,
+    draw_rectangle,
 };
 
 
@@ -10,17 +12,37 @@ pub mod paddle;
 
 pub trait MovingObject {
     fn update_position(&mut self);
-    fn draw(&self);
+    fn handle_collision<MovingObj: MovingObject>(&mut self, other: &mut MovingObj);
     fn keep_in_window(&mut self);
-    fn handle_collision(&mut self, other: Box<dyn MovingObject>);
+    fn draw(&self) {
+        draw_rectangle(self.boundary().x as f32, self.boundary().y as f32, self.boundary().w as f32, self.boundary().h as f32, *self.color())
+    }
+    fn boundary(&self) -> &Rectangle;
+    fn velocity(&self) -> &DVec2;
+    fn invert_x_velocity(&mut self);
+    fn invert_y_velocity(&mut self);
+    fn color(&self) -> &Color;
+    fn left_side(&self) -> f64 {
+        return self.boundary().left_side();
+    }
+    fn right_side(&self) -> f64 {
+        return self.boundary().right_side();
+    }
+    fn top_side(&self) -> f64 {
+        return self.boundary().top_side();
+    }
+    fn bottom_side(&self) -> f64 {
+        return self.boundary().bottom_side();
+    }
 }
 
 // x and y define the top left corner 
+#[derive(Debug)]
 pub struct Rectangle {
-    pub x: f32,
-    pub y: f32,
-    pub w: f32,
-    pub h: f32,
+    pub x: f64,
+    pub y: f64,
+    pub w: f64,
+    pub h: f64,
 }
 impl Rectangle {
     pub fn get_intersection_with(&self, other: &Rectangle) -> Option<Rectangle> {
@@ -42,26 +64,38 @@ impl Rectangle {
             return None;
         }
     }
-    pub fn center(&self) -> Vec2 {
-        let center = Vec2 {
+    pub fn left_side(&self) -> f64 {
+        return self.x;
+    }
+    pub fn right_side(&self) -> f64 {
+        return self.x + self.w;
+    }
+    pub fn top_side(&self) -> f64 {
+        return self.y;
+    }
+    pub fn bottom_side(&self) -> f64 {
+        return self.y + self.h;
+    }
+    pub fn center(&self) -> DVec2 {
+        let center = DVec2 {
             x: self.x + (self.w / 2.0),
             y: self.y + (self.h / 2.0)
         };
         return center;
     }
-    pub fn new(x: f32, y: f32, w: f32, h: f32) -> Rectangle {
+    pub fn new(x: f64, y: f64, w: f64, h: f64) -> Rectangle {
         return Rectangle { x, y, w, h };
     }
-    pub fn new_top_right(w: f32, h: f32) -> Rectangle {
-        return Rectangle { x: screen_width() - w, y: 0.0 , w, h };
+    pub fn new_top_right(w: f64, h: f64) -> Rectangle {
+        return Rectangle { x: screen_width() as f64 - w, y: 0.0 , w, h };
     }
-    pub fn new_top_left(w: f32, h: f32) -> Rectangle {
+    pub fn new_top_left(w: f64, h: f64) -> Rectangle {
         return Rectangle { x: 0.0, y: 0.0, w, h };
     }
-    pub fn new_centered(w: f32, h: f32) -> Rectangle {
-        return Rectangle { x: screen_width() / 2.0, y: screen_height() / 2.0, w, h };
+    pub fn new_centered(w: f64, h: f64) -> Rectangle {
+        return Rectangle { x: screen_width() as f64 / 2.0, y: screen_height() as f64 / 2.0, w, h };
     }
-    pub fn set_position(&mut self, x: f32, y: f32) {
+    pub fn set_position(&mut self, x: f64, y: f64) {
         self.x = x;
         self.y = y;
     }
