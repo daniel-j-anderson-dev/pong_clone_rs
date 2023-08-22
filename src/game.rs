@@ -28,21 +28,23 @@ impl State {
         let paddle_width = 20.0;
         let paddle_height = 100.0;
         let ball_size = 20.0;
-        let player0 = Paddle::new(
-            0,
-            Rectangle::new_top_left(paddle_width, paddle_height),
-            RED
-        );
-        let player1 = Paddle::new(
-            1,
-            Rectangle::new_top_right(paddle_width, paddle_height),
-            BLUE
-        );
-        let ball = Ball::new(
-            Rectangle::new_centered(ball_size, ball_size),
-            DVec2::new(1.5, 1.5),
-            WHITE
-        );
+        let player0 = Paddle {
+            player_number: 0,
+            boundary: Rectangle::new_top_left(paddle_width, paddle_height),
+            velocity: DVec2::ZERO,
+            color: RED
+        };
+        let player1 = Paddle {
+            player_number: 1,
+            boundary: Rectangle::new_top_right(paddle_width, paddle_height),
+            velocity: DVec2::ZERO,
+            color: BLUE
+        };
+        let ball = Ball {
+            boundary: Rectangle::new_centered(ball_size, ball_size),
+            velocity: DVec2::new(1.5, 1.5),
+            color: WHITE
+        };
 
         return State {
             player0,
