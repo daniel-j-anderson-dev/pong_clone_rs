@@ -16,6 +16,18 @@ use macroquad::{
     },
 };
 
+fn paddle_width() -> f64 {
+    return 20.0;
+}
+
+fn paddle_height() -> f64 {
+    return 100.0
+}
+
+fn ball_size() -> f64 {
+    return paddle_width();
+}
+
 pub struct State {
     player0: Paddle,
     player1: Paddle,
@@ -25,31 +37,24 @@ pub struct State {
 }
 impl State {
     pub fn new() -> State {
-        let paddle_width = 20.0;
-        let paddle_height = 100.0;
-        let ball_size = 20.0;
-        let player0 = Paddle {
-            player_number: 0,
-            boundary: Rectangle::new_top_left(paddle_width, paddle_height),
-            velocity: DVec2::ZERO,
-            color: RED
-        };
-        let player1 = Paddle {
-            player_number: 1,
-            boundary: Rectangle::new_top_right(paddle_width, paddle_height),
-            velocity: DVec2::ZERO,
-            color: BLUE
-        };
-        let ball = Ball {
-            boundary: Rectangle::new_centered(ball_size, ball_size),
-            velocity: DVec2::new(1.5, 1.5),
-            color: WHITE
-        };
-
         return State {
-            player0,
-            player1,
-            ball,
+            player0: Paddle {
+                player_number: 0,
+                velocity: DVec2::ZERO,
+                boundary: Rectangle::new_top_left(paddle_width(), paddle_height()),
+                color: RED
+            },
+            player1: Paddle {
+                player_number: 1,
+                boundary: Rectangle::new_top_right(paddle_width(), paddle_height()),
+                velocity: DVec2::ZERO,
+                color: BLUE
+            },
+            ball: Ball {
+                boundary: Rectangle::new_centered(ball_size(), ball_size()),
+                velocity: DVec2::new(1.5, 1.5),
+                color: WHITE
+            },
             background_color: BLACK,
             winner: None,
         };
