@@ -40,12 +40,14 @@ impl State {
         return State {
             player0: Paddle {
                 player_number: 0,
+                score: 0,
                 velocity: DVec2::ZERO,
                 boundary: Rectangle::new_top_left(paddle_width(), paddle_height()),
                 color: RED
             },
             player1: Paddle {
                 player_number: 1,
+                score: 0,
                 boundary: Rectangle::new_top_right(paddle_width(), paddle_height()),
                 velocity: DVec2::ZERO,
                 color: BLUE

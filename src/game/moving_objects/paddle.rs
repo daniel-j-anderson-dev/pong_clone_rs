@@ -14,6 +14,7 @@ const PADDLE_SPEED: f64 = 10.0;
 
 pub struct Paddle {
     pub player_number: usize,
+    pub score: u8,
     pub boundary: Rectangle,
     pub velocity: DVec2,
     pub color: Color,
@@ -22,6 +23,7 @@ impl Paddle {
     pub fn new(player_number: usize, boundary: Rectangle, color: Color) -> Self {
         return Self {
             player_number,
+            score: 0,
             boundary,
             velocity: DVec2::ZERO,
             color,
