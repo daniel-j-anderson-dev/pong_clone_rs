@@ -1,4 +1,9 @@
-use crate::game::moving_objects::{MovingObject, paddle::Paddle, Rectangle};
+use crate::game::moving_objects::{
+    MovingObject,
+    paddle::Paddle,
+    Rectangle,
+    WindowSide,
+};
 
 use macroquad::prelude::{
     Color,
@@ -32,28 +37,43 @@ impl Ball {
     }
 }
 impl MovingObject for Ball {
-    fn update_position(&mut self) {
-        self.keep_in_window();
+    fn update_position(&mut self) -> Option<WindowSide> {
+        let window_collision: Option<WindowSide> = self.keep_in_window();
         self.boundary.x += self.velocity.x;
         self.boundary.y += self.velocity.y;
+        return window_collision;
     }
-    fn keep_in_window(&mut self) {
+    fn keep_in_window(&mut self) -> Option<WindowSide> {
+        let mut window_collision: Option<WindowSide> = None;
+
         if self.boundary.x + self.velocity.x < 0.0 {
             self.velocity.x *= -1.0;
-            // self.winner = Some(1);
+            window_collision = Some(WindowSide::Left);
         }
         if self.boundary.x + self.boundary.w + self.velocity.x > screen_width() as f64{
-            // self.winner = Some(0)
             self.velocity.x *= -1.0;
+            window_collision = Some(WindowSide::Right);
         }
         if self.boundary.y + self.velocity.y < 0.0 {
             self.velocity.y *= -1.0;
+            window_collision = Some(WindowSide::Top);
         }
         if self.boundary.y + self.boundary.h + self.velocity.y > screen_height() as f64{
             self.velocity.y *= -1.0;
+            window_collision = Some(WindowSide::Bottom);
+        }
+
+        return window_collision;
+    }
+    fn handle_ball_collision<MovingObj: MovingObject>(&mut self, other: &mut MovingObj) { 
+        if let Some(intersection) = other.boundary().get_intersection_with(self.boundary()) {
+            if other.left_side() + other.velocity().x < self.right_side() {
+                other.invert_x_velocity();
+            } else if other.right_side() + other.velocity().x > self.right_side() {
+                other.invert_y_velocity();
+            }
         }
     }
-    fn handle_collision<MovingObj: MovingObject>(&mut self, other: &mut MovingObj) {}
     fn boundary(&self) -> &Rectangle {
         return &self.boundary;
     }

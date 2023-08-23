@@ -1,4 +1,4 @@
-use crate::game::moving_objects::{MovingObject, Rectangle};
+use crate::game::moving_objects::{MovingObject, Rectangle, WindowSide};
 
 use macroquad::prelude::{
     Color,
@@ -66,29 +66,38 @@ impl Paddle {
     }
 }
 impl MovingObject for Paddle {
-    fn update_position(&mut self) {
-        self.keep_in_window();
+    fn update_position(&mut self)-> Option<WindowSide> {
+        let window_collision: Option<WindowSide> = self.keep_in_window();
         self.boundary.x += self.velocity.x;
         self.boundary.y += self.velocity.y;
+        return window_collision;
     }
-    fn keep_in_window(&mut self) {
+    fn keep_in_window(&mut self)-> Option<WindowSide> {
+        let mut window_collision: Option<WindowSide> = None;
+
         if self.boundary.x + self.velocity.x < 0.0 {
             self.velocity.x = 0.0;
             self.boundary.x = 0.0;
+            window_collision = Some(WindowSide::Left);
         }
         if self.boundary.x + self.boundary.w + self.velocity.x > screen_width() as f64 {
             self.velocity.x = 0.0;
             self.boundary.x = screen_width() as f64 - self.boundary.w;
+            window_collision = Some(WindowSide::Right);
         }
 
         if self.boundary.y + self.velocity.y < 0.0 {
             self.velocity.y = 0.0;
             self.boundary.y = 0.0;
+            window_collision = Some(WindowSide::Top);
         }
         if self.boundary.y + self.boundary.h + self.velocity.y > screen_height() as f64{
             self.velocity.y = 0.0;
             self.boundary.y = screen_height() as f64 - self.boundary.h;
+            window_collision = Some(WindowSide::Bottom);
         }
+
+        return window_collision;
     }
     fn boundary(&self) -> &Rectangle {
         return &self.boundary;
@@ -105,11 +114,17 @@ impl MovingObject for Paddle {
     fn invert_y_velocity(&mut self) {
         self.velocity.y *= -1.0;
     }
-    fn handle_collision<MovingObj: MovingObject>(&mut self, ball: &mut MovingObj) {
-        if ball.left_side() + ball.velocity().x < self.right_side() {
-            ball.invert_x_velocity();
-        } else if ball.right_side() + ball.velocity().x > self.right_side() {
-            ball.invert_y_velocity();
+    fn handle_ball_collision<MovingObj: MovingObject>(&mut self, ball: &mut MovingObj) {
+        if let Some(intersection) = ball.boundary().get_intersection_with(self.boundary()) {
+            if ball.left_side() + ball.velocity().x < self.right_side() {
+                ball.invert_x_velocity();
+            } else if ball.right_side() + ball.velocity().x > self.left_side() {
+                ball.invert_x_velocity();
+            } else if ball.top_side() + ball.velocity().y < self.bottom_side() {
+                ball.invert_y_velocity();
+            } else if ball.bottom_side() + ball.velocity().y > self.top_side() {
+                ball.invert_y_velocity();
+            }
         }
     }
 }

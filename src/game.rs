@@ -1,6 +1,6 @@
 pub mod moving_objects;
 
-use self::moving_objects::{ball::Ball, paddle::Paddle, Rectangle, MovingObject};
+use self::moving_objects::{ball::Ball, paddle::Paddle, Rectangle, MovingObject, WindowSide};
 
 use macroquad::{
     prelude::{
@@ -16,24 +16,12 @@ use macroquad::{
     },
 };
 
-fn paddle_width() -> f64 {
-    return 20.0;
-}
-
-fn paddle_height() -> f64 {
-    return 100.0
-}
-
-fn ball_size() -> f64 {
-    return paddle_width();
-}
-
 pub struct State {
     player0: Paddle,
     player1: Paddle,
     ball: Ball,
     pub background_color: Color,
-    pub winner: Option<u32>,
+    pub winner: Option<usize>,
 }
 impl State {
     pub fn new() -> State {
@@ -54,7 +42,7 @@ impl State {
             },
             ball: Ball {
                 boundary: Rectangle::new_centered(ball_size(), ball_size()),
-                velocity: DVec2::new(1.5, 1.5),
+                velocity: DVec2::new(-3.0, 3.0),
                 color: WHITE
             },
             background_color: BLACK,
@@ -64,26 +52,31 @@ impl State {
 
     pub fn update(&mut self) {
         match self.winner {
-            Some(player_number) => {
-                // handle gameover
-            }
             None => {
-                self.player0.update_position();
-                self.player1.update_position();
+                let _ = self.player0.update_position();
+                let _ = self.player1.update_position();
 
                 self.player0.handle_input();
                 self.player1.handle_input();
 
-                if let Some(intersection) = self.ball.boundary.get_intersection_with(&self.player0.boundary) {
-                    println!("ball intersected with player0, {intersection:?}");
-                    self.player0.handle_collision(&mut self.ball);
-                } else if let Some(intersection) = self.ball.boundary.get_intersection_with(&self.player1.boundary) {
-                    println!("ball intersected with player0, {intersection:?}");
-                    self.player1.handle_collision(&mut self.ball);
+                self.player0.handle_ball_collision(&mut self.ball);
+                self.player1.handle_ball_collision(&mut self.ball);
+
+                if let Some(window_collision) = self.ball.update_position() {
+                    match window_collision {
+                        WindowSide::Right => self.player0.score += 1,
+                        WindowSide::Left => self.player1.score += 1,
+                        _ => {}
+                    }
                 }
 
-                self.ball.update_position();
+                if self.player0.score >= 5 {
+                    self.winner = Some(self.player0.player_number);
+                } else if self.player1.score >= 5 {
+                    self.winner = Some(self.player1.player_number);
+                }
             }
+            Some(player_number) => return,
         }
     }
 
@@ -97,10 +90,10 @@ impl State {
             }
             Some(player_number)=> {
                 clear_background(WHITE);
-                let game_over_message = &format!("player {} wins", player_number + 1);
+                let game_over_message = &format!("player {} wins\nPress escape to quit\nPress backspace to restart", player_number + 1);
                 draw_text(
                     game_over_message,
-                    screen_width() / 2.0,
+                    screen_width() / 2.5,
                     screen_height() / 2.0,
                     30.0,
                     BLACK,
@@ -108,4 +101,16 @@ impl State {
             }
         }
     }
+}
+
+fn paddle_width() -> f64 {
+    return 20.0;
+}
+
+fn paddle_height() -> f64 {
+    return 100.0
+}
+
+fn ball_size() -> f64 {
+    return paddle_width();
 }

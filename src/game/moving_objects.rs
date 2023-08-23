@@ -10,10 +10,17 @@ use macroquad::prelude::{
 pub mod ball;
 pub mod paddle;
 
+pub enum WindowSide {
+    Top,
+    Bottom,
+    Left,
+    Right,
+}
+
 pub trait MovingObject {
-    fn update_position(&mut self);
-    fn handle_collision<MovingObj: MovingObject>(&mut self, other: &mut MovingObj);
-    fn keep_in_window(&mut self);
+    fn update_position(&mut self) -> Option<WindowSide>;
+    fn handle_ball_collision<MovingObj: MovingObject>(&mut self, other: &mut MovingObj);
+    fn keep_in_window(&mut self)-> Option<WindowSide>;
     fn draw(&self) {
         draw_rectangle(self.boundary().x as f32, self.boundary().y as f32, self.boundary().w as f32, self.boundary().h as f32, *self.color())
     }
