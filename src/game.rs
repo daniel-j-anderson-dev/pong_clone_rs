@@ -51,32 +51,29 @@ impl State {
     }
 
     pub fn update(&mut self) {
-        match self.winner {
-            None => {
-                let _ = self.player0.update_position();
-                let _ = self.player1.update_position();
+        if self.winner.is_none() {
+            let _ = self.player0.update_position();
+            let _ = self.player1.update_position();
 
-                self.player0.handle_input();
-                self.player1.handle_input();
+            self.player0.handle_input();
+            self.player1.handle_input();
 
-                self.player0.handle_ball_collision(&mut self.ball);
-                self.player1.handle_ball_collision(&mut self.ball);
+            self.player0.handle_ball_collision(&mut self.ball);
+            self.player1.handle_ball_collision(&mut self.ball);
 
-                if let Some(window_collision) = self.ball.update_position() {
-                    match window_collision {
-                        WindowSide::Right => self.player0.score += 1,
-                        WindowSide::Left => self.player1.score += 1,
-                        _ => {}
-                    }
-                }
-
-                if self.player0.score >= 5 {
-                    self.winner = Some(self.player0.player_number);
-                } else if self.player1.score >= 5 {
-                    self.winner = Some(self.player1.player_number);
+            if let Some(window_collision) = self.ball.update_position() {
+                match window_collision {
+                    WindowSide::Right => self.player0.score += 1,
+                    WindowSide::Left => self.player1.score += 1,
+                    _ => {}
                 }
             }
-            Some(player_number) => return,
+
+            if self.player0.score >= 5 {
+                self.winner = Some(self.player0.player_number);
+            } else if self.player1.score >= 5 {
+                self.winner = Some(self.player1.player_number);
+            }
         }
     }
 
